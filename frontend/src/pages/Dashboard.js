@@ -13,9 +13,11 @@ function Dashboard() {
   const [selectedFolder, setSelectedFolder] = useState("");
 
   useEffect(() => {
-    fetchFolders();
-    fetchImages();
-  }, []);
+  fetchFolders();
+  fetchImages();
+
+  // eslint-disable-next-line
+}, []);
 
   // FETCH FOLDERS
   const fetchFolders = async () => {
