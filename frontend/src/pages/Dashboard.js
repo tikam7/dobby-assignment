@@ -69,7 +69,7 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        `http://localhost:5000/api/folders/size/${folderId}`,
+        `http://https://dobby-assignment-rv9j.onrender.com/api/folders/size/${folderId}`,
         {
           headers: {
             Authorization: token,
@@ -297,7 +297,7 @@ function Dashboard() {
                   {getFolderImages(folder._id).map((image) => (
                     <div key={image._id} style={{ marginTop: "15px" }}>
                       <img
-                        src={`http://localhost:5000/${image.imageUrl}`}
+                        src={`https://dobby-assignment-rv9j.onrender.com/${image.imageUrl}`}
                         alt={image.name}
                         style={{
                           width: "100%",
