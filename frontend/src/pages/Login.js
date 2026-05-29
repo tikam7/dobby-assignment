@@ -8,7 +8,7 @@ function Login() {
   const handleLogin = async () => {
     try {
       const res = await axios.post(
-        "http://https://dobby-assignment-rv9j.onrender.com/api/auth/login",
+        "https://nt-rv9j.onrender.com/api/auth/login",
         {
           email,
           password,
