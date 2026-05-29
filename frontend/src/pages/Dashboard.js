@@ -25,7 +25,7 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/folders",
+        "http://https://dobby-assignment-rv9j.onrender.com/api/folders",
         {
           headers: {
             Authorization: token,
@@ -49,7 +49,7 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/images",
+        "http://https://dobby-assignment-rv9j.onrender.com/api/images",
         {
           headers: {
             Authorization: token,
@@ -92,7 +92,7 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:5000/api/folders/create",
+        "http://https://dobby-assignment-rv9j.onrender.com/api/folders/create",
         {
           name: folderName,
           parentFolder,
@@ -124,7 +124,7 @@ function Dashboard() {
       formData.append("image", selectedFile);
 
       await axios.post(
-        "http://localhost:5000/api/images/upload",
+        "http://https://dobby-assignment-rv9j.onrender.com/api/images/upload",
         formData,
         {
           headers: {
