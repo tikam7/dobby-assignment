@@ -5,13 +5,10 @@ const uploadImage = async (req, res) => {
   try {
     const { name, folderId } = req.body;
 
-    const userId = req.user.id;
-
     const image = new Image({
       name,
-      imageUrl: req.file.path,
+      imageUrl: `/uploads/${req.file.filename}`,
       folderId,
-      userId,
       size: req.file.size,
     });
 
@@ -30,12 +27,10 @@ const uploadImage = async (req, res) => {
   }
 };
 
-// GET USER IMAGES
+// GET IMAGES
 const getImages = async (req, res) => {
   try {
-    const images = await Image.find({
-      userId: req.user.id,
-    });
+    const images = await Image.find();
 
     res.status(200).json(images);
   } catch (error) {
@@ -51,3 +46,4 @@ module.exports = {
   uploadImage,
   getImages,
 };
+

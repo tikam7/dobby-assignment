@@ -13,24 +13,17 @@ function Dashboard() {
   const [selectedFolder, setSelectedFolder] = useState("");
 
   useEffect(() => {
-  fetchFolders();
-  fetchImages();
+    fetchFolders();
+    fetchImages();
 
-  // eslint-disable-next-line
-}, []);
+    // eslint-disable-next-line
+  }, []);
 
   // FETCH FOLDERS
   const fetchFolders = async () => {
     try {
-      const token = localStorage.getItem("token");
-
       const res = await axios.get(
-        "https://dobby-assignment-rv9j.onrender.com/api/folders",
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
+        "http://localhost:5000/api/folders"
       );
 
       setFolders(res.data);
@@ -46,18 +39,17 @@ function Dashboard() {
   // FETCH IMAGES
   const fetchImages = async () => {
     try {
-      const token = localStorage.getItem("token");
-
       const res = await axios.get(
-        "https://dobby-assignment-rv9j.onrender.com/api/images",
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
+        "http://localhost:5000/api/images"
       );
 
-      setImages(res.data);
+setImages(res.data);
+
+alert(JSON.stringify(res.data[0]));
+
+
+
+
     } catch (error) {
       console.log(error);
     }
@@ -66,15 +58,8 @@ function Dashboard() {
   // FETCH FOLDER SIZE
   const fetchFolderSize = async (folderId) => {
     try {
-      const token = localStorage.getItem("token");
-
       const res = await axios.get(
-        `https://dobby-assignment-rv9j.onrender.com/api/folders/size/${folderId}`,
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
+        `http://localhost:5000/api/folders/size/${folderId}`
       );
 
       setFolderSizes((prev) => ({
@@ -86,65 +71,67 @@ function Dashboard() {
     }
   };
 
-  // CREATE FOLDER / SUBFOLDER
-  const createFolder = async (parentFolder = null) => {
+  // CREATE FOLDER
+  const createFolder = async () => {
     try {
-      const token = localStorage.getItem("token");
-
       await axios.post(
-        "https://dobby-assignment-rv9j.onrender.com/api/folders/create",
+        "http://localhost:5000/api/folders/create",
         {
           name: folderName,
-          parentFolder,
-        },
-        {
-          headers: {
-            Authorization: token,
-          },
         }
       );
 
       setFolderName("");
 
       fetchFolders();
+
+      alert("Folder Created Successfully 🚀");
     } catch (error) {
       console.log(error);
+      alert("Failed to create folder");
     }
   };
 
   // UPLOAD IMAGE
-  const uploadImage = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const formData = new FormData();
-
-      formData.append("name", imageName);
-      formData.append("folderId", selectedFolder);
-      formData.append("image", selectedFile);
-
-      await axios.post(
-        "https://dobby-assignment-rv9j.onrender.com/api/images/upload",
-        formData,
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
-      );
-
-      alert("Image Uploaded Successfully 🚀");
-
-      fetchFolders();
-      fetchImages();
-
-      setImageName("");
-      setSelectedFile(null);
-      setSelectedFolder("");
-    } catch (error) {
-      console.log(error);
+// UPLOAD IMAGE
+const uploadImage = async () => {
+  try {
+    if (!selectedFolder) {
+      alert("Please select a folder first");
+      return;
     }
-  };
+
+    if (!selectedFile) {
+      alert("Please select an image");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("name", imageName);
+    formData.append("folderId", selectedFolder);
+    formData.append("image", selectedFile);
+
+    await axios.post(
+      "http://localhost:5000/api/images/upload",
+      formData
+    );
+
+    alert("Image Uploaded Successfully 🚀");
+
+    await fetchImages();
+    await fetchFolders();
+
+    setImageName("");
+    setSelectedFile(null);
+    setSelectedFolder("");
+  } catch (error) {
+    console.log(error);
+    alert("Image Upload Failed");
+  }
+};
+
+
 
   // LOGOUT
   const logout = () => {
@@ -153,24 +140,26 @@ function Dashboard() {
     window.location.href = "/";
   };
 
-  // GET CHILD FOLDERS
-  const getChildFolders = (parentId) => {
-    return folders.filter(
-      (folder) => folder.parentFolder === parentId
-    );
-  };
-
   // GET IMAGES FOR FOLDER
-  const getFolderImages = (folderId) => {
-    return images.filter(
-      (image) => image.folderId === folderId
-    );
-  };
+// GET IMAGES FOR FOLDER
+const getFolderImages = (folderId) => {
+  return images.filter((image) => {
+    if (!image.folderId) return false;
+
+    // HANDLE OBJECT OR STRING ID
+    const currentFolderId =
+      typeof image.folderId === "object"
+        ? image.folderId._id
+        : image.folderId;
+
+    return String(currentFolderId) === String(folderId);
+  });
+};
+
+
 
   return (
     <div className="dashboard">
-      {/* NAVBAR */}
-
       <div className="navbar">
         <h1>Dobby Drive</h1>
 
@@ -192,10 +181,16 @@ function Dashboard() {
         />
 
         <button
-          onClick={() => createFolder()}
+          onClick={createFolder}
           style={{
-            background:
-              "linear-gradient(to right, #3b82f6, #6366f1)",
+            padding: "12px 20px",
+            border: "none",
+            borderRadius: "10px",
+            background: "#4f46e5",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer",
+            marginTop: "10px",
           }}
         >
           Create Folder
@@ -256,91 +251,57 @@ function Dashboard() {
           Your Workspace
         </h2>
 
-        <p
-          style={{
-            color: "#cbd5e1",
-            marginBottom: "20px",
-          }}
-        >
-          Organize folders, manage images, and monitor
-          storage beautifully.
-        </p>
-
         <div className="folder-grid">
-          {folders
-            .filter((folder) => !folder.parentFolder)
-            .map((folder) => (
-              <div key={folder._id} className="folder-card">
-                <h3>📁 {folder.name}</h3>
+          {folders.map((folder) => (
+            <div key={folder._id} className="folder-card">
+              <h3>📁 {folder.name}</h3>
 
-                <p>
-                  Storage Used:{" "}
-                  <strong>
-                    {folderSizes[folder._id] || 0} bytes
-                  </strong>
-                </p>
+              <p>
+                Storage Used:{" "}
+                <strong>
+                 
 
-                <button
-                  onClick={() => createFolder(folder._id)}
-                  style={{
-                    marginTop: "10px",
-                    background:
-                      "linear-gradient(to right, #6366f1, #8b5cf6)",
-                  }}
-                >
-                  + Add Subfolder
-                </button>
+{folderSizes[folder._id] || 0} bytes
 
-                {/* IMAGES */}
 
-                <div style={{ marginTop: "15px" }}>
-                  {getFolderImages(folder._id).map((image) => (
-                    <div key={image._id} style={{ marginTop: "15px" }}>
-                      <img
-                        src={`https://dobby-assignment-rv9j.onrender.com/${image.imageUrl}`}
-                        alt={image.name}
-                        style={{
-                          width: "100%",
-                          height: "150px",
-                          objectFit: "cover",
-                          borderRadius: "12px",
-                        }}
-                      />
 
-                      <p
-                        style={{
-                          marginTop: "8px",
-                          fontSize: "14px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        🖼️ {image.name}
-                      </p>
-                    </div>
-                  ))}
-                </div>
 
-                {/* CHILD FOLDERS */}
+                </strong>
+              </p>
 
-                <div style={{ marginTop: "20px" }}>
-                  {getChildFolders(folder._id).map((child) => (
-                    <div
-                      key={child._id}
-                      className="subfolder"
+              {/* IMAGES */}
+
+              <div style={{ marginTop: "15px" }}>
+                {getFolderImages(folder._id).map((image) => (
+                  <div
+                    key={image._id}
+                    style={{ marginTop: "15px" }}
+                  >
+                    <img
+  src={`http://localhost:5000${image.imageUrl}`}
+  alt={image.name}
+  style={{
+    width: "100%",
+    height: "150px",
+    objectFit: "cover",
+    borderRadius: "12px",
+  }}
+/>
+
+                    <p
+                      style={{
+                        marginTop: "8px",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                      }}
                     >
-                      <p>
-                        📁 <strong>{child.name}</strong>
-                      </p>
-
-                      <p>
-                        Size:{" "}
-                        {folderSizes[child._id] || 0} bytes
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                      🖼️ {image.name}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -348,3 +309,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

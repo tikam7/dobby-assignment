@@ -2,21 +2,70 @@ const express = require("express");
 
 const router = express.Router();
 
-const {
-  createFolder,
-  getFolderSize,
-  getFolders,
-} = require("../controllers/folderController");
+const Folder = require("../models/Folder");
+const Image = require("../models/Image");
 
-const authMiddleware = require("../middleware/authMiddleware");
+// CREATE FOLDER
+router.post("/create", async (req, res) => {
+  try {
+    const { name, parentFolder } = req.body;
 
-// create folder
-router.post("/create", authMiddleware, createFolder);
+    const folder = await Folder.create({
+      name,
+      parentFolder: parentFolder || null,
+    });
 
-// get all folders
-router.get("/", authMiddleware, getFolders);
+    res.json(folder);
+  } catch (error) {
+    console.log(error);
 
-// get folder size
-router.get("/size/:folderId", authMiddleware, getFolderSize);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
+// GET ALL FOLDERS
+router.get("/", async (req, res) => {
+  try {
+    const folders = await Folder.find();
+
+    res.json(folders);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
+// GET FOLDER SIZE
+router.get("/size/:folderId", async (req, res) => {
+  try {
+    const { folderId } = req.params;
+
+    const images = await Image.find({
+      folderId,
+    });
+
+    let totalSize = 0;
+
+    images.forEach((image) => {
+      totalSize += image.size;
+    });
+
+    res.json({
+      folderSize: totalSize,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
 
 module.exports = router;
+

@@ -4,16 +4,11 @@ const Image = require("../models/Image");
 // CREATE FOLDER
 const createFolder = async (req, res) => {
   try {
-    console.log(req.user);
-
     const { name, parentFolder } = req.body;
-
-    const userId = req.user.id;
 
     const folder = new Folder({
       name,
       parentFolder: parentFolder || null,
-      userId,
     });
 
     await folder.save();
@@ -74,12 +69,10 @@ const getFolderSize = async (req, res) => {
   }
 };
 
-// GET ALL USER FOLDERS
+// GET ALL FOLDERS
 const getFolders = async (req, res) => {
   try {
-    const folders = await Folder.find({
-      userId: req.user.id,
-    });
+    const folders = await Folder.find();
 
     res.status(200).json(folders);
   } catch (error) {

@@ -8,8 +8,6 @@ const {
   getImages,
 } = require("../controllers/imageController");
 
-const authMiddleware = require("../middleware/authMiddleware");
-
 // MULTER STORAGE
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -26,12 +24,11 @@ const upload = multer({ storage: storage });
 // UPLOAD IMAGE
 router.post(
   "/upload",
-  authMiddleware,
   upload.single("image"),
   uploadImage
 );
 
 // GET IMAGES
-router.get("/", authMiddleware, getImages);
+router.get("/", getImages);
 
 module.exports = router;
