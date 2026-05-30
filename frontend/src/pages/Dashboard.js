@@ -23,7 +23,7 @@ function Dashboard() {
   const fetchFolders = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/folders"
+        "https://dobby-assignment-rv9j.onrender.com/api/folders"
       );
 
       setFolders(res.data);
@@ -40,7 +40,7 @@ function Dashboard() {
   const fetchImages = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/images"
+        "https://dobby-assignment-rv9j.onrender.com/api/images"
       );
 
 setImages(res.data);
@@ -59,7 +59,7 @@ alert(JSON.stringify(res.data[0]));
   const fetchFolderSize = async (folderId) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/folders/size/${folderId}`
+        `https://dobby-assignment-rv9j.onrender.com/api/folders/size/${folderId}`
       );
 
       setFolderSizes((prev) => ({
@@ -75,7 +75,7 @@ alert(JSON.stringify(res.data[0]));
   const createFolder = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/api/folders/create",
+        "https://dobby-assignment-rv9j.onrender.com/api/folders/create",
         {
           name: folderName,
         }
@@ -113,7 +113,7 @@ const uploadImage = async () => {
     formData.append("image", selectedFile);
 
     await axios.post(
-      "http://localhost:5000/api/images/upload",
+      "https://dobby-assignment-rv9j.onrender.com/api/images/upload",
       formData
     );
 
@@ -278,7 +278,7 @@ const getFolderImages = (folderId) => {
                     style={{ marginTop: "15px" }}
                   >
                     <img
-  src={`http://localhost:5000${image.imageUrl}`}
+  src={`https://dobby-assignment-rv9j.onrender.com${image.imageUrl}`}
   alt={image.name}
   style={{
     width: "100%",
